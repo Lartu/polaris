@@ -13,5 +13,12 @@ It has been designed to be **small** in size and **minimal** in language feature
 conceived to run under **Unix** systems, either as a script running system or in REPL mode.
 It has been written in C++98, so it can probably be compiled with any C++ compiler out there.
 
+# Building Polaris
 
-**To be completed!**
+To build Polaris, clone this repository and run `c++ polaris.cpp -std=c++98 -pedantic -o polaris -l sqlite3`.
+
+libsqlite3-dev is required for building Polaris. If you're using a Debian-based Linux (like Ubuntu or Mint), you can
+install it with: `sudo apt-get install libsqlite3-dev`.
+
+
+**Rest of the readme to be completed!**
