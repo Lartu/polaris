@@ -1,0 +1,41 @@
+/*
+Recursive Fibonacci Function Written in Polaris 
+with Dynamic Programming
+*/
+
+"standard_lib/std.pol" import
+"~/.polaris.db" import
+
+(
+    addsc%
+    n lset%
+    (n lget% get "" !=)
+        (
+            n lget% get
+        )
+        (
+            (n lget% 1 <=)
+                (n lget%)
+                (
+                    n lget% 1 - fibonacci%
+                    n lget% 2 - fibonacci%
+                    +
+                )
+                if
+            n lget% set
+            n lget% get
+        )
+        if
+    delsc%
+) >fibonacci
+
+0 >n
+
+(@n 4000 <)
+    (
+    @n 1 + print ") " print
+    @n fibonacci% println%
+    @n 1 + >n
+    )
+    while
+    

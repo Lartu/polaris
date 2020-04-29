@@ -1,0 +1,4 @@
+( /* "println": Prints a message followed by a newline */
+    /* Par 1: message (top)*/
+    print "\n" print
+) >println
