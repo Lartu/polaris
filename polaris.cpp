@@ -5,8 +5,22 @@ int main(int argc, char** argv)
 {
     polaris_setup();
     string file_path = check_args(argc, argv);
-    string base_path = join_paths(".", get_working_directory(file_path));
-    eval(load_source_file(file_path), base_path);
+    if(!repl_mode)
+    {
+        string base_path = join_paths(".", get_working_directory(file_path));
+        eval(load_source_file(file_path), base_path);
+    }
+    else
+    {
+        display_version(false);
+        while (true)
+        {
+            string line = "";
+            cout << ">>> ";
+            getline(cin, line);
+            eval(line, ".");
+        }
+    }
     return 0;
 }
 
@@ -42,6 +56,7 @@ string join_paths(string base_path, string new_path)
 void polaris_exit(int code)
 {
     sqlite3_close(DB);
+    exit(code);
 }
 
 // -- polaris_setup: sets up global configurations for polaris
@@ -62,9 +77,10 @@ string check_args(int argc, char** argv)
         for (unsigned int i = 1; i < argc; ++i)
         {
             string argument = argv[i];
-            if (argument == "-v") display_version();
+            if (argument == "-v") display_version(true);
             else if (argument == "-h") display_help();
             else if (argument == "-p") show_pushpops = true;
+            else if (argument == "-r") repl_mode = true;
             else
             {
                 filename = argument;
@@ -76,7 +92,7 @@ string check_args(int argc, char** argv)
             }
         }
     }
-    if (filename == "")
+    if (!repl_mode && filename == "")
         error("\r\nUsage: polaris <file>\r\nRun polaris -h for more information");
     return filename;
 }
@@ -85,7 +101,7 @@ string check_args(int argc, char** argv)
 void error(string message)
 {
     cout << "Polaris Error: " << message << endl;
-    polaris_exit(1);
+    if (!repl_mode) polaris_exit(1);
 }
 
 // -- warning: displays a warning message without exiting polaris
@@ -95,11 +111,11 @@ void warning(string message)
 }
 
 // -- display_version: display the polaris version message, then exits
-void display_version()
+void display_version(bool exit)
 {
     cout << "This is Polaris for Unix version " << VERSION << endl;
     cout << "Copyright 2020, Martin del Rio (www.lartu.net)." << endl;
-    polaris_exit(0);
+    if (exit) polaris_exit(0);
 }
 
 // -- display_help: displays polaris help information, then exits
@@ -110,7 +126,7 @@ void display_help()
     puts("Switches:");
     puts("  -v              Display Polaris version information.");
     puts("  -h              Display this help.");
-    puts("  -m              Display memory information.");
+    puts("  -r              REPL mode.");
     puts("  -p              Show push and pops during execution.");
     puts("Complete documentation for Polaris should be found on this");
     puts("system using the 'man Polaris' command. If you have access");
@@ -269,10 +285,21 @@ void stack_push(string token, bool trim_token, bool pushempty)
 // -- stack_pop: pops a value from the stack
 string stack_pop()
 {
+    string val = "";
     if(p_stack.size() == 0)
+    {
         error("cannot pop from an empty stack.");
-    string val = p_stack.top();
-    p_stack.pop();
+        if(repl_mode)
+        {
+            cout << "An empty string has been popped for the REPL to continue.";
+            cout << endl;
+        }
+    }
+    else
+    {
+        val = p_stack.top();
+        p_stack.pop();
+    }
     if(show_pushpops) cout << "Pop: '" << val << "'" << endl;
     return val;
 }
@@ -395,11 +422,14 @@ void execute_string(string & token, string & base_path)
     {
         string source = stack_pop();
         size_t val_len = source.length();
+        bool ends_in_linebreak = false;
         for(size_t i = 0; i < val_len; ++i)
         {
+            ends_in_linebreak = false;
             if(source[i] == '\\' && i < val_len && source[i+1] == 'n')
             {
                 printf("\n");
+                ends_in_linebreak = true;
                 ++i;
             }
             else if(source[i] == '\\' && i < val_len && source[i+1] == 'r')
@@ -448,6 +478,7 @@ void execute_string(string & token, string & base_path)
             }
         }
         fflush(stdout);
+        if(repl_mode && !ends_in_linebreak) cout << endl;
     }
     /* + */
     else if(token == "+")

@@ -25,6 +25,7 @@ using namespace std;
 
 // Globals
 bool show_pushpops = false;
+bool repl_mode = false;
 stack<string> p_stack;
 map<string, string> variables;
 sqlite3* DB;
@@ -37,7 +38,7 @@ void polaris_exit(int code);
 void polaris_setup();
 void error(string message);
 void warning(string message);
-void display_version();
+void display_version(bool exit);
 void display_help();
 string exec(const char* cmd);
 string expand_home(string filename);
