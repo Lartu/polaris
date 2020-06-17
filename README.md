@@ -12,7 +12,9 @@ It has been designed to be **small** in size and **minimal** in language feature
 conceived to run under **Unix** systems.
 It has been written in C++98, so it can probably be compiled with any C++ compiler out there.
 
-```coffeescript
+```c++
+/* This is a little Polaris example */
+
 ("Tell me your name: " print input >name) >askName
 ("Hello there, " @name join print) >sayHello
 
