@@ -16,7 +16,7 @@ It has been written in C++98, so it can probably be compiled with any C++ compil
 /* This is a little Polaris example */
 
 ("Tell me your name: " print input >name) >askName
-("Hello there, " @name join print) >sayHello
+("Hello there, " @name join "\n" join print) >sayHello
 
 %askName %sayHello
 ```
