@@ -3,7 +3,7 @@
 
 // Constants
 #define EPSILON 0.000001
-#define VERSION "1.0"
+#define VERSION "1.1"
 
 // Includes
 #include <string>
@@ -14,9 +14,8 @@
 #include <memory>
 #include <stack>
 #include <map>
-#include "cpptrim.h"
+#include "libs/cpptrim.h"
 #include "math.h"
-#include <sqlite3.h> 
 using namespace std;
 
 // Types
@@ -25,10 +24,8 @@ using namespace std;
 
 // Globals
 bool show_pushpops = false;
-bool repl_mode = false;
 stack<string> p_stack;
 map<string, string> variables;
-sqlite3* DB;
 
 // Function declarations
 string check_args(int argc, char** argv);

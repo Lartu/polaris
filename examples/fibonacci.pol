@@ -4,7 +4,6 @@ with Dynamic Programming
 */
 
 "standard_lib/std.pol" import
-"~/.polaris.db" import
 
 (
     addsc%

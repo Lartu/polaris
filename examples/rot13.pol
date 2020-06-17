@@ -1,0 +1,96 @@
+/*
+    ROT13 encoder in Polaris
+    github.com/lartu/polaris
+*/
+
+"standard_lib/std.pol" import
+
+"In a village of La Mancha, the name of which I have no desire to call to mind, 
+there lived not long since one of those gentlemen that keep a lance in the lance-rack, an 
+old buckler, a lean hack, and a greyhound for coursing. An olla of rather more beef than mutton, 
+a salad on most nights, scraps on Saturdays, lentils on Fridays, and a pigeon or so extra on 
+Sundays, made away with three-quarters of his income." >message
+
+(
+    %addsc
+    $rotation %lset
+    $char %lset
+    
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $upperAlphabet %lset
+    "abcdefghijklmnopqrstuvwxyz" $lowerAlphabet %lset
+    
+    $lowerAlphabet %lget length $letterCount %lset
+    
+    0 $n %lset
+    
+    "$_!rotateChar_" $char %lget join get
+    copy
+    ("" !=)
+        (
+        )
+        (
+            del
+            $char %lget
+            
+            ($n %lget $letterCount %lget <)
+                (
+                    /* Lower Alphabet */
+                    $lowerAlphabet %lget $n %lget 1 slice
+                    $char %lget
+                    (=)
+                        (
+                            del
+                            $lowerAlphabet %lget
+                            $n %lget $rotation %lget +
+                            $letterCount %lget %
+                            1 slice
+                            $letterCount %lget $n %lset
+                        )
+                        ()
+                        if
+                        
+                    /* Lower Alphabet */
+                    $upperAlphabet %lget $n %lget 1 slice
+                    $char %lget
+                    (=)
+                        (
+                            del
+                            $upperAlphabet %lget
+                            $n %lget $rotation %lget +
+                            $letterCount %lget %
+                            1 slice
+                            $letterCount %lget $n %lset
+                        )
+                        ()
+                        if
+                    
+                    $n %lget 1 + $n %lset
+                )
+                while
+            copy
+            "$_!rotateChar_" $char %lget join set
+        )
+        if
+    %delsc
+) >!rotateChar
+
+(
+    %addsc
+        $string %lset
+        "" $rot13 %lset
+        $string %lget length $letterCount %lset
+        0 $n %lset
+        ($n %lget $letterCount %lget <)
+            (
+                $rot13 %lget
+                $string %lget $n %lget 1 slice 2 %!rotateChar
+                join
+                $rot13 %lset
+                $n %lget 1 + $n %lset
+            )
+            while
+    $rot13 %lget
+    %delsc
+) >!rot13
+
+@message %!rot13 print

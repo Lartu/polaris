@@ -8,17 +8,16 @@
 </p>
 
 # About Polaris
-**Polaris** is a stack-based, interpreted programming language with strings as its only data type.
+**Polaris** is a stack-based, concatenative, interpreted programming language with strings as its only data type.
 It has been designed to be **small** in size and **minimal** in language features. **Polaris** was
-conceived to run under **Unix** systems, either as a script running system or in REPL mode.
+conceived to run under **Unix** systems.
 It has been written in C++98, so it can probably be compiled with any C++ compiler out there.
 
 # Building Polaris
+To build Polaris, clone this repository and run `make`. You can install it using `make install`.
 
-To build Polaris, clone this repository and run `c++ polaris.cpp -std=c++98 -pedantic -o polaris -l sqlite3`.
+# Documentation
+The Polaris documentation can be [here](https://www.lartu.net/languages/polaris/).
 
-libsqlite3-dev is required for building Polaris. If you're using a Debian-based Linux (like Ubuntu or Mint), you can
-install it with: `sudo apt-get install libsqlite3-dev`.
-
-
-**Rest of the readme to be completed!**
+# License
+The Polaris Interpreter is distributed under the Apache 2.0 License.

@@ -5,22 +5,8 @@ int main(int argc, char** argv)
 {
     polaris_setup();
     string file_path = check_args(argc, argv);
-    if(!repl_mode)
-    {
-        string base_path = join_paths(".", get_working_directory(file_path));
-        eval(load_source_file(file_path), base_path);
-    }
-    else
-    {
-        display_version(false);
-        while (true)
-        {
-            string line = "";
-            cout << ">>> ";
-            getline(cin, line);
-            eval(line, ".");
-        }
-    }
+    string base_path = join_paths(".", get_working_directory(file_path));
+    eval(load_source_file(file_path), base_path);
     return 0;
 }
 
@@ -55,7 +41,6 @@ string join_paths(string base_path, string new_path)
 // -- polaris_exit: closes everything and exits
 void polaris_exit(int code)
 {
-    sqlite3_close(DB);
     exit(code);
 }
 
@@ -63,8 +48,6 @@ void polaris_exit(int code)
 void polaris_setup()
 {
     srand(time(0) * clock());
-    if (sqlite3_open(expand_home("~/.polaris.db").c_str(), &DB))
-        error((string) "Error opening DB " + sqlite3_errmsg(DB));
 }
 
 // -- check_args: checks and executes command line flags and arguments
@@ -80,7 +63,6 @@ string check_args(int argc, char** argv)
             if (argument == "-v") display_version(true);
             else if (argument == "-h") display_help();
             else if (argument == "-p") show_pushpops = true;
-            else if (argument == "-r") repl_mode = true;
             else
             {
                 filename = argument;
@@ -92,16 +74,20 @@ string check_args(int argc, char** argv)
             }
         }
     }
-    if (!repl_mode && filename == "")
-        error("\r\nUsage: polaris <file>\r\nRun polaris -h for more information");
+    if (filename == "")
+        error("\nUsage: polaris <file>\nRun polaris -h for more information");
     return filename;
 }
 
 // -- error: displays an error message and exits polaris
 void error(string message)
 {
-    cout << "Polaris Error: " << message << endl;
-    if (!repl_mode) polaris_exit(1);
+    cout << "+---------------+" << endl;
+    cout << "| Polaris Error |" << endl;
+    cout << "+---------------+";
+    if (message[0] != '\n') cout << endl << "The error was: ";
+    cout << message << endl;
+    polaris_exit(1);
 }
 
 // -- warning: displays a warning message without exiting polaris
@@ -113,25 +99,29 @@ void warning(string message)
 // -- display_version: display the polaris version message, then exits
 void display_version(bool exit)
 {
-    cout << "This is Polaris for Unix version " << VERSION << endl;
-    cout << "Copyright 2020, Martin del Rio (www.lartu.net)." << endl;
+    cout << endl;
+    cout << "  This is Polaris version " << VERSION << endl;
+    cout << "  Copyright 2020, Martin del Rio (www.lartu.net)." << endl;
+    cout << endl;
     if (exit) polaris_exit(0);
 }
 
 // -- display_help: displays polaris help information, then exits
 void display_help()
 {
-    puts("Usage:");
-    puts("  Polaris <source file>|<switch>");
-    puts("Switches:");
-    puts("  -v              Display Polaris version information.");
-    puts("  -h              Display this help.");
-    puts("  -r              REPL mode.");
-    puts("  -p              Show push and pops during execution.");
-    puts("Complete documentation for Polaris should be found on this");
-    puts("system using the 'man Polaris' command. If you have access");
-    puts("to the internet, the documentation can also be found online");
-    puts("at www.lartu.net/projects/Polaris.");
+    puts("");
+    puts(" Usage:");
+    puts("   polaris <source file> [<switch>...]");
+    puts(" Switches:");
+    puts("   -v              Display Polaris version information.");
+    puts("   -h              Display this help.");
+    puts("   -p              Show push and pops during execution.");
+    puts("");
+    puts(" Complete documentation for Polaris should be found on this");
+    puts(" system using the 'man polaris' command. If you have access");
+    puts(" to the internet, the documentation can also be found online");
+    puts(" at www.lartu.net/languages/polaris.");
+    puts("");
     polaris_exit(0);
 }
 
@@ -289,11 +279,6 @@ string stack_pop()
     if(p_stack.size() == 0)
     {
         error("cannot pop from an empty stack.");
-        if(repl_mode)
-        {
-            cout << "An empty string has been popped for the REPL to continue.";
-            cout << endl;
-        }
     }
     else
     {
@@ -478,7 +463,6 @@ void execute_string(string & token, string & base_path)
             }
         }
         fflush(stdout);
-        if(repl_mode && !ends_in_linebreak) cout << endl;
     }
     /* + */
     else if(token == "+")
@@ -814,6 +798,12 @@ void execute_string(string & token, string & base_path)
         get_var_value(var_name);
         eval(stack_pop(), base_path);
     }
+    /* % */
+    else if(token.length() > 1 && token[0] == '%'){
+        string var_name = token.substr(1, token.length()-1);
+        get_var_value(var_name);
+        eval(stack_pop(), base_path);
+    }
     /* exec */
     else if(token == "exec"){
         stack_push(exec(stack_pop().c_str()), false, true);
@@ -852,19 +842,6 @@ void execute_string(string & token, string & base_path)
             error("trying to sleep a non-numerical amount of time.");
         }
         polaris_delay(str_to_num(value1));
-    }
-    // Query
-    else if(token == "query")
-    {
-        /*string query = stack_pop();
-        int return_code = 0; 
-        char* error_msg; 
-        return_code = sqlite3_exec(DB, query.c_str(), NULL, 0, &error_msg);
-        if (return_code != SQLITE_OK) { 
-            warning(error_msg);
-            sqlite3_free(error_msg); 
-        }*/
-        //TODO terminar esto
     }
     /* Number */
     else if(str_is_num(token)){

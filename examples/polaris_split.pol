@@ -1,0 +1,16 @@
+/* String Split in Polaris */
+
+
+/* --- Imports --- */
+"standard_lib/std.pol" import
+
+/* --- Functions --- */
+(
+    addsc%
+    str lset% /* Guardo el string a splittear */
+    0 lset%
+    delsc%
+) >split
+
+/* --- Procedure --- */
+"El string original es este"

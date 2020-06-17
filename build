@@ -1,2 +1,0 @@
-clear
-c++ polaris.cpp -std=c++98 -pedantic -o polaris -l sqlite3 && ./polaris examples/fibonacci.pol

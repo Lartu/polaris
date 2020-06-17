@@ -1,0 +1,186 @@
+/* Arrays in Polaris */
+
+
+/* --- Imports --- */
+"standard_lib/std.pol" import
+
+/* --- Functions --- */
+(
+    addsc%
+    array_name lset%
+    0
+    "$_arr_" array_name lget% join "_len" join set
+    delsc%
+) >arr_create
+
+(    
+    addsc%
+    array_name lset%
+    "$_arr_" array_name lget% join "_len" join get
+    len lset%
+    (len lget% "" =)
+        (
+            "The array " array_name lget% join 
+            " doesn't exist." join
+            pliberror%
+        )
+        (
+            len lget%
+        )
+        if
+    delsc%
+) >arr_len
+
+(
+    addsc%
+    array_name lset%
+    index lset%
+    "$_arr_" array_name lget% join "_len" join get
+    len lset%
+    (len lget% "" =)
+        (
+            "The array " array_name lget% join 
+            " doesn't exist." join
+            pliberror%
+        )
+        ()
+        if
+    (index lget% 1 + len lget% > index lget% 0 < |)
+        (
+            "Index out of bounds " index lget% join
+            " for array " join array_name lget% join
+            "." join
+            pliberror%
+        )
+        (
+            "$_arr_" array_name lget% join
+            "_[" join index lget% join get
+        )
+        if
+    delsc%
+) >arr_index
+
+(
+    addsc%
+    array_name lset%
+    value lset%
+    "$_arr_" array_name lget% join "_len" join get
+    len lset%
+    (len lget% "" =)
+        (
+            "The array " array_name lget% join 
+            " doesn't exist." join
+            pliberror%
+        )
+        (
+            len lget% 1 +
+            "$_arr_" array_name lget% join "_len" join set
+            value lget%
+            "$_arr_" array_name lget% join
+            "_[" join len lget% join set
+        )
+        if        
+    delsc%
+) >arr_push
+
+(
+    addsc%
+    array_name lset%
+    "$_arr_" array_name lget% join "_len" join get
+    len lset%
+    (len lget% "" =)
+        (
+            "The array " array_name lget% join 
+            " doesn't exist." join
+            pliberror%
+        )
+        ()
+        if        
+    (len lget% 0 =)
+        (
+            "Cannot pop from empty array: " 
+            array_name lget% join
+            pliberror%
+        )
+        (
+            len lget% 1 -
+            "$_arr_" array_name lget% join "_len" join set
+            /* TODO DELETE VARIABLE */
+        )
+        if
+    delsc%
+) >arr_pop
+
+(
+    addsc%
+    array_name lset%
+    "$_arr_" array_name lget% join "_len" join get
+    len lset%
+    (len lget% "" =)
+        (
+            "The array " array_name lget% join 
+            " doesn't exist." join
+            pliberror%
+        )
+        ()
+        if        
+    /* TODO DELETE ALL INDEXES */
+    0 "$_arr_" array_name lget% join "_len" join set
+    delsc%
+) >arr_clear
+
+(
+    addsc%
+    array_name lset%
+    "$_arr_" array_name lget% join "_len" join get
+    len lset%
+    (len lget% "" =)
+        (
+            "The array " array_name lget% join 
+            " doesn't exist." join
+            pliberror%
+        )
+        ()
+        if        
+    array_name lget% arr_clear%
+    "" "$_arr_" array_name lget% join "_len" join set
+    /* DELETE VARIABLE INSTEAD OF SETTING IT TO "" */
+    /* IDEA: TODO: SETTING VAR TO "" DELETES IT */
+    delsc%
+) >arr_delete
+
+/*
+TODO:
+arr_copy
+*/
+
+/* --- Procedure --- */
+"Polaris List Example" println%
+
+mi_array arr_create%
+mi_array arr_len% "Largo: " swap join println%
+"Hola!" mi_array arr_push%
+"Chau!" mi_array arr_push%
+"Chau!" mi_array arr_push%
+"Chau!" mi_array arr_push%
+"Chau!" mi_array arr_push%
+mi_array arr_len% "Largo: " swap join println%
+0 mi_array arr_index% println%
+1 mi_array arr_index% println%
+mi_array arr_pop%
+mi_array arr_len% "Largo: " swap join println%
+mi_array arr_clear%
+mi_array arr_len% "Largo: " swap join println%
+
+/*
+Idea:
+Por convencion, variables que empiecen con $ son de la
+standard lib. Variables que empiecen con $$ son de una
+lib.
+*/
+
+/*
+TODO: Las funciones de arriba deberían tener en cuenta el nivel de scope
+para poder crear arrays locales. Debería haber un contador de arrays cosa
+de que delsc pueda eliminar todos los arrays que quedaron.
+*/
