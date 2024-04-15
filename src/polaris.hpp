@@ -1,9 +1,9 @@
-#ifndef polarisp
+#ifndef polaris
 #define polaris
 
 // Constants
-#define EPSILON 0.000001
-#define VERSION "1.1"
+#define EPSILON std::numeric_limits<double>::epsilon()
+#define VERSION "1.2"
 
 // Includes
 #include <string>
@@ -14,6 +14,7 @@
 #include <memory>
 #include <stack>
 #include <map>
+#include <limits>
 #include "libs/cpptrim.h"
 #include "math.h"
 using namespace std;
